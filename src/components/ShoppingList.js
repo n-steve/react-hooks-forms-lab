@@ -4,34 +4,46 @@ import Filter from "./Filter";
 import Item from "./Item";
 
 function ShoppingList({ items }) {
-  const [searchedItem, setSearchedItem] = useState("");
   const [dataArr, setDataArr] = useState(items);
+  const [inputField, setInputField] = useState("");
+
+  function onItemFormSubmit(newItem) {
+    setDataArr([...dataArr, newItem]);
+  }
 
   function handleSearch(event) {
-    setSearchedItem(event.target.value);
-    console.log("hi", event.target.value);
+    setInputField(event.target.value);
 
-    setDataArr(
-      dataArr.filter((item) => {
-        console.log({ searchedItem, item, dataArr }, event.target.value);
+    const searchFilteredItems = items.filter((item) => {
+      const splitItemName = item.name.split(" ");
+
+      if (splitItemName.length > 1) {
+        for (const splitItem of splitItemName) {
+          if (event.target.value === splitItem) return item.name;
+        }
+      }
+
+      if (event.target.value === item.name)
         return event.target.value === item.name;
-      })
-    );
+      else if (event.target.value === "") return true;
+    });
+    setDataArr(searchFilteredItems);
   }
 
   function handleCategoryChange(event) {
-    setDataArr(
-      items.filter((item) => {
-        if (event.target.value === "All") return true;
-        return event.target.value === item.category;
-      })
-    );
+    const filteredItems = items.filter((item) => {
+      if (event.target.value === "All") return true;
+      return event.target.value === item.category;
+    });
+
+    setDataArr(filteredItems);
   }
 
   return (
     <div className="ShoppingList">
-      <ItemForm />
+      <ItemForm onItemFormSubmit={onItemFormSubmit} />
       <Filter
+        search={inputField}
         onCategoryChange={handleCategoryChange}
         onSearchChange={handleSearch}
       />
@@ -45,3 +57,6 @@ function ShoppingList({ items }) {
 }
 
 export default ShoppingList;
+
+//setDataArr(...dataArr,new thing adding to the array (event.target.value))
+//look up append to Array in useState
